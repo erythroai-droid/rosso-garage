@@ -40,17 +40,21 @@ function Content({ onLoadProgress }: { onLoadProgress: (v: number) => void }) {
   // a block that is being covered by the next one darkens (scrubbed, so it follows the scroll exactly)
   useEffect(() => {
     if (!ready) return;
-    const ctx = gsap.context(() => {
-      // a block darkens as the next one slides over it (scrubbed, so it follows the scroll exactly)
-      const coverEl = (s: HTMLElement) => (s.matches('.seq,.macro') ? s.querySelector<HTMLElement>('.seq-stage') : s);
-      const slides = [...document.querySelectorAll<HTMLElement>('[data-slide]')];
-      slides.forEach((cur, i) => {
-        if (i === 0) return;
-        const prev = coverEl(slides[i - 1]);
-        if (!prev) return;
-        gsap.to(prev, { '--cover': 1, ease: 'none', scrollTrigger: { trigger: cur.closest<HTMLElement>('.pin-spacer') ?? cur, start: 'top bottom', end: 'top top', scrub: true } });
-      });
-    });
+    // A block darkens while the next one slides over it. Stateless: the amount is recomputed every frame from where the next block is on the
+    // screen, so it can never stay stuck (e.g. after scrolling back up) the way tween state can.
+    const coverEl = (s: HTMLElement) => (s.matches('.seq,.macro') ? s.querySelector<HTMLElement>('.seq-stage') : s);
+    const slides = [...document.querySelectorAll<HTMLElement>('[data-slide]')];
+    const pairs = slides.slice(1).map((cur, i) => ({ prev: coverEl(slides[i]), probe: cur.closest<HTMLElement>('.pin-spacer') ?? cur, last: -1 }));
+    const tick = () => {
+      const vh = window.innerHeight;
+      for (const p of pairs) {
+        if (!p.prev) continue;
+        const v = Math.round(Math.max(0, Math.min(1, 1 - p.probe.getBoundingClientRect().top / vh)) * 100) / 100;
+        if (v !== p.last) { p.last = v; p.prev.style.setProperty('--cover', String(v)); }
+      }
+    };
+    gsap.ticker.add(tick);
+    const ctx = { revert: () => { gsap.ticker.remove(tick); pairs.forEach((p) => p.prev?.style.removeProperty('--cover')); } };
     // the footer is not pinned: a free zone from the moment it fills the screen to the end of the page
     const cleanups = ['#contact'].map((sel) => {
       const el = document.querySelector<HTMLElement>(sel)!;
