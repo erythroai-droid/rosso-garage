@@ -1,10 +1,10 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
-import { gsap, HOLD, registerZone, ScrollTrigger, useScrollReady } from '@/lib/scroll';
+import { gsap, HOLD, registerZone, ScrollTrigger, useScrollReady, useStaticMode } from '@/lib/scroll';
 
 // Macro photo: scale-only zoom on scroll (no frames), one scrubbed GSAP timeline.
-export default function MacroZoom({ covered }: { covered?: boolean }) {
+function AnimatedMacro({ covered }: { covered?: boolean }) {
   const { t } = useI18n();
   const ready = useScrollReady();
   const track = useRef<HTMLElement>(null);
@@ -47,4 +47,26 @@ export default function MacroZoom({ covered }: { covered?: boolean }) {
       </div>
     </section>
   );
+}
+
+// Static page: the photo, a heading and the caption, no zoom.
+function StaticMacro() {
+  const { t } = useI18n();
+  return (
+    <section id="detail" className="macro-static" data-slide="seq">
+      <div className="card-head"><small className="lot">Rosso Spider</small><h2 className="big">Rosso<br /><span>{t('word_detail')}</span></h2></div>
+      <div className="card-img">
+        <picture>
+          <source media="(max-width: 900px)" srcSet="/macro/macro-900.webp" />
+          <img src="/macro/macro-1600.webp" alt={t('m_alt')} loading="lazy" />
+        </picture>
+      </div>
+      <div className="card-copy"><p>{t('m_copy')}</p></div>
+    </section>
+  );
+}
+
+export default function MacroZoom({ covered }: { covered?: boolean }) {
+  const staticMode = useStaticMode();
+  return staticMode ? <StaticMacro /> : <AnimatedMacro covered={covered} />;
 }

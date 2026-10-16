@@ -1,5 +1,5 @@
 'use client';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState, useSyncExternalStore } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
@@ -8,6 +8,11 @@ if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger, ScrollSmoo
 
 /** Pause (in screens, 100 = one screen) at the end of a block before the next one starts to slide over it. Keep in sync with --hold in globals.css. */
 export const HOLD = 60;
+
+/** Phones/tablets and people who asked for reduced motion get a static page: no smooth scroll, pins or scrubbing, only still images. Keep in sync with the inline script in layout.tsx. */
+export const STATIC_QUERY = '(max-width: 900px), (prefers-reduced-motion: reduce)';
+const subscribeStatic = (cb: () => void) => { const mq = window.matchMedia(STATIC_QUERY); mq.addEventListener('change', cb); return () => mq.removeEventListener('change', cb); };
+export const useStaticMode = () => useSyncExternalStore(subscribeStatic, () => window.matchMedia(STATIC_QUERY).matches, () => false);
 
 export const prefersReducedMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -18,8 +23,12 @@ export const useScrollReady = () => useContext(Ready);
 /** Wrap the page content (not fixed UI like the header or modals). */
 export function SmoothScroll({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
+  const staticMode = useStaticMode();
 
   useEffect(() => {
+    const isStatic = window.matchMedia(STATIC_QUERY).matches;
+    document.documentElement.classList.toggle('static', isStatic);
+    if (isStatic) { setReady(false); return; }            // static page: nothing below is created
     // one source of truth for "a screen": the same number the ScrollTriggers use (innerHeight). Updated on width change or a big height change,
     // not on the small changes of the phone's address bar, which would make everything jump.
     // --vh only ever grows while the width stays the same, so a screen-high block can never be shorter than the visible area
@@ -46,7 +55,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
     document.fonts?.ready.then(refresh);
     window.addEventListener('load', refresh);
     return () => { window.removeEventListener('load', refresh); window.removeEventListener('resize', onResize); ScrollTrigger.removeEventListener('refreshInit', setVh); sm.kill(); };
-  }, []);
+  }, [staticMode]);
 
   return (
     <Ready.Provider value={ready}>
@@ -67,7 +76,11 @@ export function refreshScroll() { ScrollTrigger.refresh(); }
 /** Glide to the section that contains `hash` (menu and search links). */
 export function goToSection(hash: string) {
   const sm = ScrollSmoother.get();
-  if (!sm) return;
+  if (!sm) {                                              // static page: native smooth scroll
+    if (hash === '#top') window.scrollTo({ top: 0, behavior: 'smooth' });
+    else document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
   if (hash === '#top') { sm.scrollTo(0, true); return; }
   const el = document.querySelector<HTMLElement>(hash);
   const slide = el?.closest<HTMLElement>('[data-slide]') ?? el?.querySelector<HTMLElement>('[data-slide]') ?? el;

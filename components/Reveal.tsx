@@ -16,7 +16,7 @@ export default function Reveal({ children, delay = 0, className = '' }: { childr
       onStart: () => node.classList.add('in'),
     });
     const st = ScrollTrigger.create({ trigger: node, start: 'top 94%', once: true, onEnter: () => tween.play() });
-    return () => { st.kill(); tween.kill(); };
+    return () => { st.kill(); tween.kill(); gsap.set(node, { clearProps: 'opacity,visibility,transform' }); };   // never leave a block hidden behind (e.g. when the page turns static)
   }, [ready, delay]);
 
   return <div ref={el} className={`rv ${className}`}>{children}</div>;

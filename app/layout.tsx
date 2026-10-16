@@ -15,6 +15,10 @@ export const viewport: Viewport = { themeColor: '#07080b', width: 'device-width'
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" dir="ltr" className={heebo.variable} suppressHydrationWarning>
+      <head>
+        {/* decide the static (no-animation) layout before first paint, so phones never flash the animated one */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.toggle('static',matchMedia('(max-width: 900px), (prefers-reduced-motion: reduce)').matches)" }} />
+      </head>
       <body><I18nProvider>{children}</I18nProvider></body>
     </html>
   );

@@ -1,6 +1,6 @@
 'use client';
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import { gsap, HOLD, registerZone, ScrollTrigger, useScrollReady } from '@/lib/scroll';
+import { gsap, HOLD, registerZone, ScrollTrigger, useScrollReady, useStaticMode } from '@/lib/scroll';
 
 export type Scene = { from: number; to: number; node: ReactNode; side?: 'start' | 'end' };
 
@@ -20,7 +20,7 @@ type Props = {
 const DIM = 0.42;             // background darkening: black overlay alpha painted over each frame (cheaper than a CSS filter)
 const tier = () => (window.innerWidth <= 900 ? 768 : window.innerWidth <= 1600 ? 1280 : 1920);
 
-export default function FrameSequence({ id, rise, covered, name, count, vh = 400, scenes = [], title, eager, onLoadProgress }: Props) {
+function AnimatedSequence({ id, rise, covered, name, count, vh = 400, scenes = [], title, eager, onLoadProgress }: Props) {
   const ready = useScrollReady();
   const track = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -126,4 +126,30 @@ export default function FrameSequence({ id, rise, covered, name, count, vh = 400
       </div>
     </section>
   );
+}
+
+// Static page (phones, reduced motion): one still image per scene, with its caption. No canvas, no scrubbing.
+const stillFor = (name: string, count: number, s: Scene, first: boolean) => {
+  const mid = Math.min(1, (s.from + Math.min(s.to, 1)) / 2);
+  const n = first ? 1 : Math.max(1, Math.min(count, Math.round(mid * (count - 1)) + 1));
+  return `/frames/${name}/768/frame_${String(n).padStart(4, '0')}.webp`;
+};
+
+function StaticSequence({ id, name, count, scenes = [], title }: Props) {
+  return (
+    <section id={id} className="cards" data-slide="seq">
+      {scenes.map((s, i) => (
+        <article key={i} className="card">
+          {i === 0 && title && <div className="card-head">{title}</div>}
+          <div className="card-img"><img src={stillFor(name, count, s, i === 0)} alt="" loading={i === 0 ? 'eager' : 'lazy'} width={768} height={432} /></div>
+          <div className="card-copy">{s.node}</div>
+        </article>
+      ))}
+    </section>
+  );
+}
+
+export default function FrameSequence(props: Props) {
+  const staticMode = useStaticMode();
+  return staticMode ? <StaticSequence {...props} /> : <AnimatedSequence {...props} />;
 }

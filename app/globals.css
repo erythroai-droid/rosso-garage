@@ -232,3 +232,31 @@ html[lang=he] .cap b,html[lang=he] small,html[lang=he] h4{font-weight:600}
   background:rgba(7,8,11,.55);backdrop-filter:blur(6px);opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .35s ease,transform .35s ease,background .25s,color .25s}
 .totop.on{opacity:1;transform:none;pointer-events:auto}
 .totop:hover{background:var(--fg);color:#000;border-color:var(--fg)}
+
+/* ---------- static page (phones, reduced motion): still images only, normal document flow ---------- */
+html.static #smooth-wrapper{overflow:visible}
+html.static .pre{display:none}
+html.static .rv{opacity:1;visibility:visible}
+html.static .num{animation:none!important}
+html.static .spec::after{width:100%;transition:none}
+html.static .grp.over{margin-block-start:0}
+html.static .grp .rise{margin-block-start:0}
+html.static .rise{box-shadow:none}
+html.static .seq-stage{display:none}
+html.static .tb{position:static;min-height:0;padding:64px var(--gx);border-radius:0;box-shadow:none}
+html.static .tb-in{zoom:1}
+html.static .tb::after,html.static .specs::after,html.static .split::after{display:none}
+html.static .specs{min-height:0;display:block;padding:64px var(--gx)}
+html.static .specs-in,html.static .split-copy{zoom:1}
+html.static .split{min-height:0}
+html.static .split-img{height:auto;aspect-ratio:16/9}
+html.static .ftr{min-height:0;padding-block-start:96px}
+html.static .cards,html.static .macro-static{background:var(--bg)}
+html.static .card-head{padding:96px var(--gx) 20px}
+html.static .card-img{position:relative;aspect-ratio:16/9;overflow:hidden;background:#000}
+html.static .card-img img{width:100%;height:100%;object-fit:cover;display:block}
+html.static .card-img::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(7,8,11,.35),transparent 25%,transparent 60%,var(--bg)),rgba(0,0,0,var(--dim))}
+html.static .card-copy{padding:20px var(--gx) 56px}
+html.static .card-copy>p{color:var(--mute);font-size:15px;line-height:1.6}
+html.static .macro-static .card-img{aspect-ratio:4/3}
+html.static .seq-title,html.static .scene,html.static .hud{display:none}

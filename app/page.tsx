@@ -11,7 +11,7 @@ import TextBlock from '@/components/TextBlock';
 import PinSection from '@/components/PinSection';
 import ScrollTop from '@/components/ScrollTop';
 import { useI18n } from '@/lib/i18n';
-import { SmoothScroll, gsap, initMagnet, registerZone, ScrollTrigger, useScrollReady } from '@/lib/scroll';
+import { SmoothScroll, gsap, initMagnet, registerZone, ScrollTrigger, useScrollReady, useStaticMode } from '@/lib/scroll';
 
 const Cap = ({ k, h, p, cta }: { k: string; h: string; p: string; cta?: string }) => (
   <div className="cap">
@@ -23,7 +23,8 @@ const Cap = ({ k, h, p, cta }: { k: string; h: string; p: string; cta?: string }
 export default function Page() {
   const [pct, setPct] = useState(0);
   // restored scroll position far from the hero: don't hold the page behind the preloader
-  useEffect(() => { if (window.scrollY > 300) setPct(100); }, []);
+  const staticMode = useStaticMode();
+  useEffect(() => { if (window.scrollY > 300 || staticMode) setPct(100); }, [staticMode]);   // the static page loads no frame sequence, nothing to wait for
   return (
     <>
       <Preloader pct={pct} />
