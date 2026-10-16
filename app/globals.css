@@ -281,7 +281,7 @@ html.static .seq-title,html.static .scene,html.static .hud{display:none}
 .ai-x:hover{background:var(--fg);color:#000}
 .ai-list{flex:1;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
 .ai-msg{max-width:86%;padding:10px 14px;font-size:13.5px;line-height:1.5;border-radius:14px;animation:aiIn .35s ease both}
-.ai-msg.ai{align-self:flex-start;background:rgba(255,255,255,.07);border-end-start-radius:4px}
+.ai-msg.bot{align-self:flex-start;background:rgba(255,255,255,.07);border-end-start-radius:4px}
 .ai-msg.me{align-self:flex-end;background:var(--red);color:#fff;border-end-end-radius:4px}
 .ai-typing{display:flex;gap:5px;align-items:center;padding-block:14px}
 .ai-typing i{width:6px;height:6px;border-radius:50%;background:var(--mute);animation:aiDot 1s infinite ease-in-out}
