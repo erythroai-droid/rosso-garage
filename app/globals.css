@@ -266,3 +266,36 @@ html.static .split-img img{width:100%;height:100%;object-fit:cover}
 html.static .split-img::after{background:linear-gradient(to bottom,rgba(7,8,11,.55),rgba(7,8,11,.8) 45%,rgba(7,8,11,.94)),rgba(0,0,0,var(--dim))}
 html.static .split-copy{position:relative;z-index:2;padding:96px var(--gx) 56px}
 html.static .seq-title,html.static .scene,html.static .hud{display:none}
+
+
+/* ---------- AI consultant (demo chat) ---------- */
+.totop{inset-block-end:calc(3.6vh + 38px + 60px)}
+.ai-fab{position:fixed;z-index:26;inset-inline-end:var(--gx);inset-block-end:calc(3.6vh + 38px);height:46px;display:inline-flex;align-items:center;gap:10px;padding-inline:18px;border-radius:23px;background:var(--red);border:1px solid var(--red);color:#fff;font-size:12px;letter-spacing:.04em;transition:opacity .3s,transform .3s,background .25s,color .25s}
+.ai-fab:hover{background:#fff;color:#000;border-color:#fff}
+.ai-fab.hide{opacity:0;transform:translateY(10px);pointer-events:none}
+.ai{position:fixed;z-index:61;inset-inline-end:var(--gx);inset-block-end:calc(3.6vh + 38px);width:min(380px,calc(100vw - 2 * var(--gx)));height:min(560px,calc(var(--vh) - 120px));display:flex;flex-direction:column;background:#0e1015;border:1px solid rgba(255,255,255,.12);box-shadow:0 24px 60px rgba(0,0,0,.55);border-radius:14px;overflow:hidden}
+.ai-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-block-end:1px solid rgba(255,255,255,.08)}
+.ai-head b{display:block;font-size:15px;font-weight:600}
+.ai-head small{display:block;margin-block-start:3px;font-size:11px;color:var(--mute);letter-spacing:.04em}
+.ai-x{width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%}
+.ai-x:hover{background:var(--fg);color:#000}
+.ai-list{flex:1;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
+.ai-msg{max-width:86%;padding:10px 14px;font-size:13.5px;line-height:1.5;border-radius:14px;animation:aiIn .35s ease both}
+.ai-msg.ai{align-self:flex-start;background:rgba(255,255,255,.07);border-end-start-radius:4px}
+.ai-msg.me{align-self:flex-end;background:var(--red);color:#fff;border-end-end-radius:4px}
+.ai-typing{display:flex;gap:5px;align-items:center;padding-block:14px}
+.ai-typing i{width:6px;height:6px;border-radius:50%;background:var(--mute);animation:aiDot 1s infinite ease-in-out}
+.ai-typing i:nth-child(2){animation-delay:.15s}.ai-typing i:nth-child(3){animation-delay:.3s}
+.ai-quick{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 12px}
+.ai-quick button{font-size:12px;padding:7px 12px;border:1px solid var(--line);border-radius:16px;transition:background .2s,color .2s}
+.ai-quick button:hover:not(:disabled){background:var(--fg);color:#000}
+.ai-quick button:disabled{opacity:.4;cursor:default}
+.ai-form{display:flex;gap:8px;padding:12px 14px;border-block-start:1px solid rgba(255,255,255,.08)}
+.ai-form input{flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid transparent;border-radius:20px;padding:11px 16px;color:inherit;font:inherit;font-size:13.5px;outline:none}
+.ai-form input:focus{border-color:var(--line)}
+.ai-form button{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:50%;background:var(--red);color:#fff}
+.ai-form button:disabled{opacity:.4;cursor:default}
+[dir=rtl] .ai-form button svg{transform:scaleX(-1)}
+@keyframes aiIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes aiDot{0%,60%,100%{opacity:.3;transform:none}30%{opacity:1;transform:translateY(-3px)}}
+@media (max-width:900px){.ai{inset-inline:12px;inset-block-end:12px;width:auto;height:min(78vh,620px)}}

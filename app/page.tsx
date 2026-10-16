@@ -10,6 +10,7 @@ import Reveal from '@/components/Reveal';
 import TextBlock from '@/components/TextBlock';
 import PinSection from '@/components/PinSection';
 import ScrollTop from '@/components/ScrollTop';
+import AiChat from '@/components/AiChat';
 import { useI18n } from '@/lib/i18n';
 import { SmoothScroll, gsap, initMagnet, registerZone, ScrollTrigger, useScrollReady, useStaticMode } from '@/lib/scroll';
 
@@ -30,6 +31,7 @@ export default function Page() {
       <Preloader pct={pct} />
       <Header />
       <ScrollTop />
+      <AiChat />
       <SmoothScroll><Content onLoadProgress={(v) => setPct((p) => Math.max(p, v))} /></SmoothScroll>
     </>
   );
