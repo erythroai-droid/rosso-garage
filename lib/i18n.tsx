@@ -11,7 +11,7 @@ export const LANGS: { code: Lang; label: string; name: string }[] = [
 type Dict = Record<string, string>;
 
 const en: Dict = {
-  loading: 'Loading', menu_open: 'Open menu', search: 'Search', close: 'Close', lang: 'Language',
+  loading: 'Loading', to_top: 'Back to top', menu_open: 'Open menu', search: 'Search', close: 'Close', lang: 'Language',
   contact_seller: 'Contact Seller',
   nav_overview: 'Overview', nav_exterior: 'Exterior', nav_design: 'Design', nav_detail: 'Detail', nav_numbers: 'Numbers', nav_contact: 'Contact',
   menu_foot: 'Lot 0001 · Rosso Spider · hello@example.com',
@@ -55,7 +55,7 @@ const en: Dict = {
 };
 
 const ru: Dict = {
-  loading: 'Загрузка', menu_open: 'Открыть меню', search: 'Поиск', close: 'Закрыть', lang: 'Язык',
+  loading: 'Загрузка', to_top: 'Наверх', menu_open: 'Открыть меню', search: 'Поиск', close: 'Закрыть', lang: 'Язык',
   contact_seller: 'Связаться с продавцом',
   nav_overview: 'Обзор', nav_exterior: 'Экстерьер', nav_design: 'Дизайн', nav_detail: 'Детали', nav_numbers: 'Характеристики', nav_contact: 'Контакты',
   menu_foot: 'Лот 0001 · Rosso Spider · hello@example.com',
@@ -99,7 +99,7 @@ const ru: Dict = {
 };
 
 const he: Dict = {
-  loading: 'טוען', menu_open: 'פתח תפריט', search: 'חיפוש', close: 'סגור', lang: 'שפה',
+  loading: 'טוען', to_top: 'חזרה למעלה', menu_open: 'פתח תפריט', search: 'חיפוש', close: 'סגור', lang: 'שפה',
   contact_seller: 'צור קשר עם המוכר',
   nav_overview: 'סקירה', nav_exterior: 'חוץ', nav_design: 'עיצוב', nav_detail: 'פרטים', nav_numbers: 'נתונים', nav_contact: 'צור קשר',
   menu_foot: 'פריט 0001 · Rosso Spider · hello@example.com',
@@ -155,8 +155,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     let l: Lang = 'en';
     try {
       const saved = localStorage.getItem('lang');
-      if (saved === 'en' || saved === 'ru' || saved === 'he') l = saved;
-      else { const n = navigator.language.slice(0, 2); if (n === 'ru' || n === 'he') l = n; }
+      if (saved === 'en' || saved === 'ru' || saved === 'he') l = saved;   // English by default; only an explicit choice changes it
     } catch { /* storage unavailable */ }
     setLangState(l);
   }, []);

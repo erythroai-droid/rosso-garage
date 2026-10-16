@@ -226,3 +226,9 @@ html[lang=he] .cap b,html[lang=he] small,html[lang=he] h4{font-weight:600}
 
 /* ScrollSmoother wrapper */
 #smooth-wrapper{overflow:hidden}
+
+/* ---------- back to top ---------- */
+.totop{position:fixed;z-index:25;inset-inline-end:var(--gx);inset-block-end:calc(3.6vh + 38px);width:46px;height:46px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;
+  background:rgba(7,8,11,.55);backdrop-filter:blur(6px);opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .35s ease,transform .35s ease,background .25s,color .25s}
+.totop.on{opacity:1;transform:none;pointer-events:auto}
+.totop:hover{background:var(--fg);color:#000;border-color:var(--fg)}
