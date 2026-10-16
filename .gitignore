@@ -3,3 +3,6 @@ node_modules
 tsconfig.tsbuildinfo
 .idea
 .next-build
+check_i18n.js
+translations_dump.json
+translations_table.md
