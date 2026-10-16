@@ -132,7 +132,7 @@ function AnimatedSequence({ id, rise, covered, name, count, vh = 400, scenes = [
 const stillFor = (name: string, count: number, s: Scene, first: boolean) => {
   const mid = Math.min(1, (s.from + Math.min(s.to, 1)) / 2);
   const n = first ? 1 : Math.max(1, Math.min(count, Math.round(mid * (count - 1)) + 1));
-  return `/frames/${name}/768/frame_${String(n).padStart(4, '0')}.webp`;
+  return `/frames/${name}/1280/frame_${String(n).padStart(4, '0')}.webp`;   // the image fills a whole phone screen, 768 would be soft
 };
 
 function StaticSequence({ id, name, count, scenes = [], title }: Props) {
@@ -141,7 +141,7 @@ function StaticSequence({ id, name, count, scenes = [], title }: Props) {
       {scenes.map((s, i) => (
         <article key={i} className="card">
           {i === 0 && title && <div className="card-head">{title}</div>}
-          <div className="card-img"><img src={stillFor(name, count, s, i === 0)} alt="" loading={i === 0 ? 'eager' : 'lazy'} width={768} height={432} /></div>
+          <div className="card-img"><img src={stillFor(name, count, s, i === 0)} alt="" loading={i === 0 ? 'eager' : 'lazy'} width={1280} height={720} /></div>
           <div className="card-copy">{s.node}</div>
         </article>
       ))}

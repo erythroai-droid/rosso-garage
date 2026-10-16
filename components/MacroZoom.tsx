@@ -53,13 +53,10 @@ function AnimatedMacro({ covered }: { covered?: boolean }) {
 function StaticMacro() {
   const { t } = useI18n();
   return (
-    <section id="detail" className="macro-static" data-slide="seq">
+    <section id="detail" className="macro-static card" data-slide="seq">
       <div className="card-head"><small className="lot">Rosso Spider</small><h2 className="big">Rosso<br /><span>{t('word_detail')}</span></h2></div>
       <div className="card-img">
-        <picture>
-          <source media="(max-width: 900px)" srcSet="/macro/macro-900.webp" />
-          <img src="/macro/macro-1600.webp" alt={t('m_alt')} loading="lazy" />
-        </picture>
+        <img src="/macro/macro-1600.webp" alt={t('m_alt')} loading="lazy" />
       </div>
       <div className="card-copy"><p>{t('m_copy')}</p></div>
     </section>
