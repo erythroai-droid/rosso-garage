@@ -205,7 +205,8 @@ html[lang=he] .cap b,html[lang=he] small,html[lang=he] h3{font-weight:600}
   .seq-title h1,.big,.macro-title h2{font-size:clamp(44px,15vw,90px)}
   .tb{border-radius:18px 18px 0 0;padding-block:10vh}
   .tb-in{grid-template-columns:1fr;gap:28px}
-  .tb h2,.specs h2{font-size:clamp(32px,10vw,60px)}
+  .tb h2,.specs h2,.split-copy h2{font-size:clamp(36px,11.6vw,84px);line-height:.92}
+  .cap h2{font-size:clamp(26px,7.5vw,40px)}
   .tb-stats b{font-size:clamp(28px,34cqw,100px)}.spec b{font-size:clamp(34px,34cqw,120px)}
   .specs-grid{grid-template-columns:1fr 1fr;row-gap:44px}
   .split{grid-template-columns:1fr}.split-img{height:55vh}.split-copy{padding:48px var(--gx)}
