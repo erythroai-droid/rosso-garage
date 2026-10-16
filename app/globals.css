@@ -1,6 +1,6 @@
 :root{
   --bg:#07080b; --fg:#f2efe9; --mute:#8d8b86; --red:#d3202c; --line:rgba(255,255,255,.22);
-  --y:#ffc21a; --r2:#ff3b47;
+  --y:#ffc21a; --r2:#ff3b47; --red-t:#ff4d58;   /* red for small text: --red is under 4.5:1 on the dark background */
   --dim:.42;                       /* background darkening: alpha of the black overlay (canvas uses DIM in FrameSequence.tsx) */
   --vh:100vh;                      /* real viewport height in px, written by SmoothScroll (svh/vh differ on phones and left uncovered strips) */
   --hold:calc(var(--vh) * .6);    /* pause at the end of a block before the next one slides over it (HOLD in lib/scroll.tsx) */
@@ -56,7 +56,7 @@ html[lang=he] .cap b,html[lang=he] small,html[lang=he] h3{font-weight:600}
 .scene{position:absolute;z-index:3;inset-inline-start:var(--gx);inset-block-end:11vh;max-width:min(380px,82vw);opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease;pointer-events:none}
 .scene.end{inset-inline-start:auto;inset-inline-end:var(--gx);text-align:end}
 .scene.on{opacity:1;transform:none;pointer-events:auto}
-.cap b{display:block;font-size:11px;letter-spacing:.3em;color:var(--red);text-transform:uppercase;margin-block-end:12px;font-weight:600}
+.cap b{display:block;font-size:11px;letter-spacing:.3em;color:var(--red-t);text-transform:uppercase;margin-block-end:12px;font-weight:600}
 .cap h2{font-weight:400;font-size:clamp(20px,2vw,30px);line-height:1.2;letter-spacing:-.01em;margin-block-end:12px}
 .cap p{color:var(--mute);font-size:14px;line-height:1.55}
 .more{display:inline-flex;gap:10px;margin-block-start:22px;font-size:13px;border-block-end:1px solid var(--line);padding-block-end:4px}
@@ -91,7 +91,7 @@ html[lang=he] .cap b,html[lang=he] small,html[lang=he] h3{font-weight:600}
 /* ---------- text blocks ---------- */
 .tb{position:relative;background:var(--bg);min-height:calc(var(--vh) + 4px);display:flex;align-items:center;padding:12vh var(--gx);border-radius:28px 28px 0 0;box-shadow:0 -40px 80px rgba(0,0,0,.65)}
 .tb-in{zoom:var(--fit,1);display:grid;grid-template-columns:.7fr 1.6fr;gap:6vw;width:100%;align-items:start}
-.tb small{font-size:11px;letter-spacing:.3em;color:var(--red);text-transform:uppercase}
+.tb small{font-size:11px;letter-spacing:.3em;color:var(--red-t);text-transform:uppercase}
 .tb h2,.specs h2,.split-copy h2{font-weight:800;font-size:clamp(34px,5.6vw,96px);line-height:.92;letter-spacing:-.04em;text-transform:uppercase}
 .tb p{color:var(--mute);font-size:clamp(14px,1.2vw,17px);line-height:1.65;max-width:520px;margin-block-start:28px}
 
@@ -122,7 +122,7 @@ html[lang=he] .cap b,html[lang=he] small,html[lang=he] h3{font-weight:600}
 /* ---------- numbers section ---------- */
 .specs{background:#0b0c10;padding:14vh var(--gx);min-height:calc(var(--vh) + 4px);display:flex;flex-direction:column;justify-content:center}
 .specs-in{zoom:var(--fit,1)}
-.specs small{font-size:11px;letter-spacing:.3em;color:var(--red)}
+.specs small{font-size:11px;letter-spacing:.3em;color:var(--red-t)}
 .specs h2{margin-block:20px 8vh}
 .specs-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3vw;border-block-start:1px solid rgba(255,255,255,.1);padding-block-start:5vh}
 .spec{position:relative;padding-block-end:22px}
@@ -139,7 +139,7 @@ html[lang=he] .cap b,html[lang=he] small,html[lang=he] h3{font-weight:600}
 .split-img img{width:100%;height:100%;object-fit:cover}
 .split-img::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,var(--dim))}
 .split-copy{align-self:center;padding:8vw 6vw;zoom:var(--fit,1)}
-.split-copy small{font-size:11px;letter-spacing:.3em;color:var(--red)}
+.split-copy small{font-size:11px;letter-spacing:.3em;color:var(--red-t)}
 .split-copy h2{font-size:clamp(30px,4.4vw,72px);margin-block:20px}
 .split-copy p{color:var(--mute);font-size:15px;line-height:1.6;max-width:460px;margin-block-end:14px}
 
@@ -171,7 +171,7 @@ html[lang=he] .cap b,html[lang=he] small,html[lang=he] h3{font-weight:600}
 .modal.open .modal-box{transform:none}
 .modal-x{position:absolute;inset-block-start:16px;inset-inline-end:16px;width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%}
 .modal-x:hover{background:var(--fg);color:#000}
-.modal small{font-size:11px;letter-spacing:.3em;color:var(--red);text-transform:uppercase}
+.modal small{font-size:11px;letter-spacing:.3em;color:var(--red-t);text-transform:uppercase}
 .modal h2{font-weight:800;font-size:clamp(26px,3vw,38px);letter-spacing:-.03em;text-transform:uppercase;margin-block:14px 22px}
 .form label{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);margin-block-end:16px}
 .form input,.form textarea,.srch input{display:block;width:100%;margin-block-start:8px;background:transparent;border:0;border-block-end:1px solid var(--line);color:var(--fg);font:inherit;font-size:16px;letter-spacing:0;text-transform:none;padding-block:8px;outline:none}
