@@ -1,35 +1,38 @@
 'use client';
 import { ReactNode, useEffect, useRef, useState } from 'react';
+import { gsap, HOLD, registerZone, ScrollTrigger, useScrollReady } from '@/lib/scroll';
 
-export type Scene = { from: number; to: number; node: ReactNode; side?: 'left' | 'right' };
+export type Scene = { from: number; to: number; node: ReactNode; side?: 'start' | 'end' };
 
 type Props = {
   id?: string;
+  rise?: boolean;             // rides over the previous (pinned) block
+  covered?: boolean;          // the next block slides over this one, so its last screen is not scrub range
   name: 'orbit' | 'top';
   count: number;
-  vh?: number;               // scroll length of the section in vh
+  vh?: number;                // scrub length in screens
   scenes?: Scene[];
-  title?: ReactNode;         // block shown top-left while the first scene is active
-  eager?: boolean;           // load immediately (otherwise when near the viewport)
+  title?: ReactNode;          // block shown top-left while the first scene is active
+  eager?: boolean;            // load immediately (otherwise when near the viewport)
   onLoadProgress?: (pct: number) => void;
 };
 
-const LERP = 0.1;
-const DIM = 0.50;           // background darkening: black overlay alpha painted over each frame (cheaper than CSS filter)
+const DIM = 0.42;             // background darkening: black overlay alpha painted over each frame (cheaper than a CSS filter)
 const tier = () => (window.innerWidth <= 900 ? 768 : window.innerWidth <= 1600 ? 1280 : 1920);
 
-export default function FrameSequence({ id, name, count, vh = 400, scenes = [], title, eager, onLoadProgress }: Props) {
+export default function FrameSequence({ id, rise, covered, name, count, vh = 400, scenes = [], title, eager, onLoadProgress }: Props) {
+  const ready = useScrollReady();
   const track = useRef<HTMLElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
   const cv = useRef<HTMLCanvasElement>(null);
-  const bar = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
 
   useEffect(() => {
-    const canvas = cv.current!, trackEl = track.current!, ctx = canvas.getContext('2d')!;
+    if (!ready) return;
+    const canvas = cv.current!, trackEl = track.current!, stageEl = stage.current!, ctx = canvas.getContext('2d')!;
     const dir = `/frames/${name}/${tier()}`;
     const imgs: (HTMLImageElement | null)[] = new Array(count).fill(null);
-    let cssW = 0, cssH = 0, target = 0, current = 0, drawn = -1, visible = false, started = false, raf = 0, last = performance.now();
-    let activeIdx = 0, loaded = 0;
+    let cssW = 0, cssH = 0, frame = 0, drawn = -1, visible = false, started = false, gen = 0, loaded = 0, activeIdx = 0;
 
     const ok = (i: number) => !!imgs[i] && imgs[i]!.naturalWidth > 0;
     const nearest = (i: number) => {
@@ -58,28 +61,8 @@ export default function FrameSequence({ id, name, count, vh = 400, scenes = [], 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.imageSmoothingQuality = 'high';
       drawn = -1;
     };
-    const progress = () => {
-      const r = trackEl.getBoundingClientRect(), total = trackEl.offsetHeight - window.innerHeight;
-      return total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
-    };
-    const onScroll = () => {
-      const p = progress();
-      target = p * (count - 1);
-      if (bar.current) bar.current.style.height = p * 100 + '%';
-      const a = Math.max(0, scenes.findIndex((s) => p >= s.from && p < s.to));
-      if (a !== activeIdx) { activeIdx = a; setActive(a); }
-    };
-    const tick = (now: number) => {
-      raf = requestAnimationFrame(tick);
-      const dt = Math.min(0.1, (now - last) / 1000); last = now;
-      if (!visible) return;
-      current += (target - current) * (1 - Math.pow(1 - LERP, dt * 60));
-      if (Math.abs(target - current) < 0.01) current = target;
-      const i = Math.round(current);
-      if (i !== drawn) draw(i);
-    };
 
-    let gen = 0;
+    // ---- loading: start when the section is within one screen, free the decoded bitmaps when it is far away ----
     const load = () => {
       if (started) return;
       started = true; loaded = 0;
@@ -93,46 +76,51 @@ export default function FrameSequence({ id, name, count, vh = 400, scenes = [], 
         im.src = `${dir}/frame_${String(i + 1).padStart(4, '0')}.webp`;
       }
     };
-    // free decoded frames when the section is far away (decoded bitmaps are ~4 MB each at 1280px)
-    const unload = () => {
-      if (!started) return;
-      started = false; gen++;
-      imgs.fill(null); drawn = -1;
-    };
+    const unload = () => { if (!started) return; started = false; gen++; imgs.fill(null); drawn = -1; };
 
-    resize(); onScroll();
-    // start loading when the section is within 1.5 screens; draw only while it is on screen
-    const near = new IntersectionObserver((e) => { if (e[0].isIntersecting) load(); else unload(); }, { rootMargin: '100% 0px 100% 0px' });
-    const vis = new IntersectionObserver((e) => {
-      visible = e[0].isIntersecting;
-      if (visible) { onScroll(); current = target; drawn = -1; }
+    // ---- GSAP: pin the stage for the whole track, scrub the frame index over the scrub length ----
+    const scrubLen = () => trackEl.offsetHeight - (covered ? 2 + HOLD / 100 : 1) * window.innerHeight;
+    const pin = ScrollTrigger.create({ trigger: trackEl, start: 'top top', end: 'bottom bottom', pin: stageEl, pinSpacing: false });
+    const scrub = ScrollTrigger.create({
+      trigger: trackEl, start: 'top top', end: () => `+=${Math.max(1, scrubLen())}`, invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        frame = self.progress * (count - 1);
+        const a = Math.max(0, scenes.findIndex((s) => self.progress >= s.from && self.progress < s.to));
+        if (a !== activeIdx) { activeIdx = a; setActive(a); }
+      },
     });
+    // free zone: the scrubbed part plus the pause after it (until the next block starts to slide over)
+    const unreg = registerZone({ a: () => scrub.start, b: () => (covered ? pin.end - window.innerHeight : scrub.end) });
+    const tick = () => { if (!visible) return; const i = Math.round(frame); if (i !== drawn) draw(i); };
+    gsap.ticker.add(tick);
+
+    resize();
+    const near = new IntersectionObserver((e) => { if (e[0].isIntersecting) load(); else unload(); }, { rootMargin: '100% 0px 100% 0px' });
+    const vis = new IntersectionObserver((e) => { visible = e[0].isIntersecting; if (visible) drawn = -1; });
     near.observe(trackEl); vis.observe(trackEl);
     if (eager) load();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    const onResize = () => { resize(); onScroll(); };
+    const onResize = () => resize();
     window.addEventListener('resize', onResize);
-    raf = requestAnimationFrame(tick);
     return () => {
-      cancelAnimationFrame(raf); near.disconnect(); vis.disconnect();
-      window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onResize);
+      gsap.ticker.remove(tick); near.disconnect(); vis.disconnect(); pin.kill(); scrub.kill(); unreg();
+      window.removeEventListener('resize', onResize);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, count]);
+  }, [ready, name, count]);
 
   return (
-    <section ref={track} id={id} className="seq" style={{ height: `${vh}vh` }}>
-      <div className="seq-stage">
+    <section ref={track} id={id} className={`seq ${rise ? 'rise' : ''}`} style={{ height: `calc(var(--vh) * ${(vh + (covered ? 100 + HOLD : 0)) / 100})` }} data-slide="seq" {...(covered ? { 'data-covered': '' } : {})}>
+      <div ref={stage} className="seq-stage">
         <canvas ref={cv} className="seq-canvas" />
         <div className="seq-glow" />
         <div className="seq-shade" />
         {title && <div className="seq-title" style={{ opacity: active === 0 ? 1 : 0 }}>{title}</div>}
         {scenes.map((s, i) => (
-          <div key={i} className={`scene ${s.side === 'right' ? 'right' : ''} ${i === active ? 'on' : ''}`}>{s.node}</div>
+          <div key={i} className={`scene ${s.side === 'end' ? 'end' : ''} ${i === active ? 'on' : ''}`}>{s.node}</div>
         ))}
         <div className="hud">
           <span>{String(active + 1).padStart(2, '0')}</span>
-          <i className="hud-line"><i ref={bar as React.RefObject<HTMLElement>} className="hud-fill" /></i>
+          <i className="hud-line" />
           <span>{String(scenes.length).padStart(2, '0')}</span>
         </div>
       </div>

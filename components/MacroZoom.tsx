@@ -1,55 +1,48 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import { useI18n } from '@/lib/i18n';
+import { gsap, HOLD, registerZone, ScrollTrigger, useScrollReady } from '@/lib/scroll';
 
-// Macro photo: scale-only zoom on scroll (no frames), smoothed with lerp.
-export default function MacroZoom() {
+// Macro photo: scale-only zoom on scroll (no frames), one scrubbed GSAP timeline.
+export default function MacroZoom({ covered }: { covered?: boolean }) {
+  const { t } = useI18n();
+  const ready = useScrollReady();
   const track = useRef<HTMLElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
   const img = useRef<HTMLDivElement>(null);
   const txt = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const t = track.current!, el = img.current!, tx = txt.current!;
-    let target = 0, cur = 0, visible = false, raf = 0, last = performance.now();
-    const p = () => {
-      const r = t.getBoundingClientRect(), total = t.offsetHeight - window.innerHeight;
-      return total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
-    };
-    const onScroll = () => { target = p(); };
-    const apply = () => {
-      el.style.transform = `scale(${1 + cur * 0.9})`;                    // 1.0 -> 1.9
-      const o = Math.min(1, Math.max(0, (cur - 0.1) / 0.25)) * (1 - Math.min(1, Math.max(0, (cur - 0.85) / 0.15)));
-      tx.style.opacity = String(o); tx.style.transform = `translateY(${(1 - o) * 24}px)`;
-    };
-    const tick = (now: number) => {
-      raf = requestAnimationFrame(tick);
-      const dt = Math.min(0.1, (now - last) / 1000); last = now;
-      if (!visible) return;
-      cur += (target - cur) * (1 - Math.pow(1 - 0.1, dt * 60));
-      if (Math.abs(target - cur) < 0.0005) cur = target;
-      apply();
-    };
-    const io = new IntersectionObserver((e) => { visible = e[0].isIntersecting; if (visible) { onScroll(); cur = target; apply(); } });
-    io.observe(t); onScroll(); apply();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    raf = requestAnimationFrame(tick);
-    return () => { cancelAnimationFrame(raf); io.disconnect(); window.removeEventListener('scroll', onScroll); };
-  }, []);
+    if (!ready) return;
+    const trackEl = track.current!;
+    const scrubLen = () => trackEl.offsetHeight - (covered ? 2 + HOLD / 100 : 1) * window.innerHeight;
+    const pin = ScrollTrigger.create({ trigger: trackEl, start: 'top top', end: 'bottom bottom', pin: stage.current!, pinSpacing: false });
+    const tl = gsap.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: { trigger: trackEl, start: 'top top', end: () => `+=${Math.max(1, scrubLen())}`, scrub: true, invalidateOnRefresh: true },
+    });
+    tl.fromTo(img.current, { scale: 1 }, { scale: 1.9, duration: 1 }, 0)
+      .fromTo(txt.current, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.2 }, 0.1)
+      .to(txt.current, { autoAlpha: 0, duration: 0.15 }, 0.85);
+    const unreg = registerZone({ a: () => tl.scrollTrigger!.start, b: () => (covered ? pin.end - window.innerHeight : tl.scrollTrigger!.end) });
+    return () => { pin.kill(); tl.scrollTrigger?.kill(); tl.kill(); unreg(); };
+  }, [ready, covered]);
 
   return (
-    <section ref={track} className="macro" id="detail">
-      <div className="seq-stage">
+    <section ref={track} className="macro rise" id="detail" data-slide="seq" {...(covered ? { 'data-covered': '' } : {})}>
+      <div ref={stage} className="seq-stage">
         <div ref={img} className="macro-img">
           <picture>
             <source media="(max-width: 900px)" srcSet="/macro/macro-900.webp" />
             <source media="(max-width: 1600px)" srcSet="/macro/macro-1600.webp" />
-            <img src="/macro/macro-2400.webp" alt="Macro view of the Rosso Spider front end" draggable={false} />
+            <img src="/macro/macro-2400.webp" alt={t('m_alt')} draggable={false} />
           </picture>
         </div>
         <div className="macro-dim" />
         <div className="seq-shade" />
-        <div className="macro-title"><small>Rosso Spider</small><h2 className="big">Rosso<br /><span>Detail</span></h2></div>
+        <div className="macro-title"><small>Rosso Spider</small><h2 className="big">Rosso<br /><span>{t('word_detail')}</span></h2></div>
         <div ref={txt} className="macro-copy">
-          <p>Matte paint, carbon inserts and yellow accents: every detail is assembled by hand.</p>
+          <p>{t('m_copy')}</p>
         </div>
       </div>
     </section>

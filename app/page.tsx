@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Header from '@/components/Header';
 import Preloader from '@/components/Preloader';
 import FrameSequence, { Scene } from '@/components/FrameSequence';
@@ -7,142 +7,139 @@ import MacroZoom from '@/components/MacroZoom';
 import Footer from '@/components/Footer';
 import CountUp from '@/components/CountUp';
 import Reveal from '@/components/Reveal';
+import TextBlock from '@/components/TextBlock';
+import PinSection from '@/components/PinSection';
+import { useI18n } from '@/lib/i18n';
+import { SmoothScroll, gsap, initMagnet, registerZone, ScrollTrigger, useScrollReady } from '@/lib/scroll';
 
 const Cap = ({ k, h, p, cta }: { k: string; h: string; p: string; cta?: string }) => (
   <div className="cap">
     <b>{k}</b><h3>{h}</h3><p>{p}</p>
-    {cta && <a className="more" href="#detail">{cta} <span>→</span></a>}
+    {cta && <a className="more" href="#detail">{cta} <span className="arr">→</span></a>}
   </div>
 );
-
-type Stat = [ReactNode, string];
-// `over`: the block slides up over the pinned last frame of the previous image section
-const TextBlock = ({ id, k, h, paras, stats, over }: { id?: string; k: string; h: ReactNode; paras: string[]; stats?: Stat[]; over?: boolean }) => (
-  <section id={id} className={`tb ${over ? 'over' : ''}`}>
-    <div className="tb-in">
-      <Reveal><small>{k}</small></Reveal>
-      <div>
-        <Reveal delay={80}><h2>{h}</h2></Reveal>
-        {paras.map((t, i) => <Reveal key={i} delay={160 + i * 90}><p>{t}</p></Reveal>)}
-        {stats && (
-          <Reveal delay={320}>
-            <div className="tb-stats">{stats.map(([b, s]) => <div key={s}><b>{b}</b><span>{s}</span></div>)}</div>
-          </Reveal>
-        )}
-      </div>
-    </div>
-  </section>
-);
-
-const orbitScenes: Scene[] = [
-  { from: 0, to: 0.24, node: <Cap k="Front" h="A family of extreme performance cars" p="Low stance, yellow accents on the hood and slim LED headlights." cta="Discover more" /> },
-  { from: 0.24, to: 0.4, side: 'right', node: <Cap k="Side" h="Clean profile" p="Black wheels with a yellow rim line and an open top underline the proportions." /> },
-  { from: 0.4, to: 0.82, node: <Cap k="Rear" h="Wing and exhaust" p="Black rear wing, diffuser and a twin exhaust." /> },
-  { from: 0.82, to: 1.01, side: 'right', node: <Cap k="Full circle" h="Back to the start" p="Scroll up to turn the car back." /> },
-];
-const topScenes: Scene[] = [
-  { from: 0, to: 0.34, node: <Cap k="Top" h="A new generation of cabin styling." p="Strict symmetry: matte body, yellow air intakes, open cabin." cta="Discover the detail" /> },
-  { from: 0.34, to: 0.68, side: 'right', node: <Cap k="Cockpit" h="Open cabin" p="Carbon seats with yellow stitching and a low windscreen header." /> },
-  { from: 0.68, to: 1.01, node: <Cap k="Hood" h="Yellow accents" p="The camera moves in: hood vents and matte paint." /> },
-];
 
 export default function Page() {
   const [pct, setPct] = useState(0);
   // restored scroll position far from the hero: don't hold the page behind the preloader
   useEffect(() => { if (window.scrollY > 300) setPct(100); }, []);
   return (
-    <main id="top">
+    <>
       <Preloader pct={pct} />
       <Header />
+      <SmoothScroll><Content onLoadProgress={(v) => setPct((p) => Math.max(p, v))} /></SmoothScroll>
+    </>
+  );
+}
 
+function Content({ onLoadProgress }: { onLoadProgress: (v: number) => void }) {
+  const ready = useScrollReady();
+  const { t } = useI18n();
+  // a block that is being covered by the next one darkens (scrubbed, so it follows the scroll exactly)
+  useEffect(() => {
+    if (!ready) return;
+    const ctx = gsap.context(() => {
+      // a block darkens as the next one slides over it (scrubbed, so it follows the scroll exactly)
+      const coverEl = (s: HTMLElement) => (s.matches('.seq,.macro') ? s.querySelector<HTMLElement>('.seq-stage') : s);
+      const slides = [...document.querySelectorAll<HTMLElement>('[data-slide]')];
+      slides.forEach((cur, i) => {
+        if (i === 0) return;
+        const prev = coverEl(slides[i - 1]);
+        if (!prev) return;
+        gsap.to(prev, { '--cover': 1, ease: 'none', scrollTrigger: { trigger: cur.closest<HTMLElement>('.pin-spacer') ?? cur, start: 'top bottom', end: 'top top', scrub: true } });
+      });
+    });
+    // the footer is not pinned: a free zone from the moment it fills the screen to the end of the page
+    const cleanups = ['#contact'].map((sel) => {
+      const el = document.querySelector<HTMLElement>(sel)!;
+      const st = ScrollTrigger.create({ trigger: el, start: 'top top', invalidateOnRefresh: true });
+      const unreg = registerZone({ a: () => st.start, b: () => Math.min(ScrollTrigger.maxScroll(window), st.start + Math.max(0, el.offsetHeight - window.innerHeight)) });
+      return () => { st.kill(); unreg(); };
+    });
+    const magnet = initMagnet();
+    return () => { ctx.revert(); cleanups.forEach((c) => c()); magnet(); };
+  }, [ready]);
+
+  const orbitScenes: Scene[] = useMemo(() => [
+    { from: 0, to: 0.24, node: <Cap k={t('o1k')} h={t('o1h')} p={t('o1p')} cta={t('o1c')} /> },
+    { from: 0.24, to: 0.4, side: 'end', node: <Cap k={t('o2k')} h={t('o2h')} p={t('o2p')} /> },
+    { from: 0.4, to: 0.82, node: <Cap k={t('o3k')} h={t('o3h')} p={t('o3p')} /> },
+    { from: 0.82, to: 1.01, side: 'end', node: <Cap k={t('o4k')} h={t('o4h')} p={t('o4p')} /> },
+  ], [t]);
+  const topScenes: Scene[] = useMemo(() => [
+    { from: 0, to: 0.34, node: <Cap k={t('t1k')} h={t('t1h')} p={t('t1p')} cta={t('t1c')} /> },
+    { from: 0.34, to: 0.68, side: 'end', node: <Cap k={t('t2k')} h={t('t2h')} p={t('t2p')} /> },
+    { from: 0.68, to: 1.01, node: <Cap k={t('t3k')} h={t('t3h')} p={t('t3p')} /> },
+  ], [t]);
+
+  return (
+    <main id="top">
       <FrameSequence
-        name="orbit" count={180} vh={450} eager scenes={orbitScenes} onLoadProgress={(v) => setPct((p) => Math.max(p, v))}
-        title={<><div className="lot">LOT 0001</div><h1>Rosso<br /><span>Spider</span></h1><div className="price">Price on request<small>inclusive of applicable buyer&apos;s fee</small></div></>}
+        name="orbit" count={180} vh={450} covered eager scenes={orbitScenes} onLoadProgress={onLoadProgress}
+        title={<><div className="lot">{t('lot')}</div><h1>Rosso<br /><span>Spider</span></h1><div className="price">{t('price')}<small>{t('price_note')}</small></div></>}
       />
 
-      <TextBlock
-        id="exterior" over
-        k="01 — Exterior"
-        h={<>A shape you can read<br /><span>from every side.</span></>}
-        paras={[
-          'A low silhouette, a long hood and an open top are drawn in a single line, from the slim LED headlights to the black rear wing. The matte paint does not glare, so the form stays readable even in the half-light of the studio.',
-          'Yellow hood vents, a yellow line on the black wheels and carbon inserts are the only contrast against the deep red. Everything else is pure geometry.',
-          'Demo text and figures: replace them with the real data of the car.',
-        ]}
-        stats={[
-          [<CountUp key="a" to={360} suffix="°" />, 'view'],
-          [<CountUp key="b" to={4} />, 'angles'],
-          [<CountUp key="c" to={180} />, 'frames'],
-        ]}
-      />
+      {/* each group: the text block slides up over the pinned section above, then the next image section rides up over the text block */}
+      <div className="grp over" style={{ zIndex: 1 }}>
+        <TextBlock
+          id="exterior" k={t('b1k')} h1={t('b1h1')} h2={t('b1h2')} paras={[t('b1p1'), t('b1p2'), t('b1p3')]}
+          stats={[[<CountUp key="a" to={360} suffix="°" />, t('b1s1')], [<CountUp key="b" to={4} />, t('b1s2')], [<CountUp key="c" to={180} />, t('b1s3')]]}
+        />
+        <FrameSequence
+          id="design" rise covered name="top" count={180} vh={350} scenes={topScenes}
+          title={<><div className="lot">Rosso Spider</div><h2 className="big">Rosso<br /><span>{t('word_design')}</span></h2></>}
+        />
+      </div>
 
-      <FrameSequence
-        id="design" name="top" count={180} vh={350} scenes={topScenes}
-        title={<><div className="lot">Rosso Spider</div><h2 className="big">Rosso<br /><span>Design</span></h2></>}
-      />
+      <div className="grp over" style={{ zIndex: 2 }}>
+        <TextBlock
+          k={t('b2k')} h1={t('b2h1')} h2={t('b2h2')} paras={[t('b2p1'), t('b2p2')]}
+          stats={[[<CountUp key="a" to={2} />, t('b2s1')], [<CountUp key="b" to={100} suffix="%" />, t('b2s2')], [<CountUp key="c" to={12} />, t('b2s3')]]}
+        />
+        <MacroZoom covered />
+      </div>
 
-      <TextBlock
-        over
-        k="02 — Cabin"
-        h={<>A cabin built<br /><span>around the driver.</span></>}
-        paras={[
-          'From above you can see how the space is organised: two carbon bucket seats, a low windscreen header and a steering wheel placed at the centre of the composition. Nothing extra, every panel in its place.',
-          'Yellow stitching on the seats repeats the accents of the body, and the open top leaves the driver alone with the road. Next, the camera moves in on the details.',
-        ]}
-        stats={[
-          [<CountUp key="a" to={2} />, 'seats'],
-          [<CountUp key="b" to={100} suffix="%" />, 'hand assembled'],
-          [<CountUp key="c" to={12} />, 'paint layers'],
-        ]}
-      />
+      <div className="grp over" style={{ zIndex: 3 }}>
+        <TextBlock k={t('b3k')} h1={t('b3h1')} h2={t('b3h2')} paras={[t('b3p1'), t('b3p2')]} />
+        <PinSection id="numbers" className="specs rise" fit=".specs-in">
+          <div className="specs-in" aria-label={t('sp_label')}>
+          <Reveal><small>{t('sp_k')}</small></Reveal>
+          <Reveal delay={80}><h2>{t('sp_h1')}<br /><span>{t('sp_h2')}</span></h2></Reveal>
+          <div className="specs-grid">
+            <Reveal delay={120}><div className="spec"><b><CountUp to={780} /></b><span>{t('sp_l1')}</span></div></Reveal>
+            <Reveal delay={200}><div className="spec"><b><CountUp to={2.5} decimals={1} /></b><span>{t('sp_l2')}</span></div></Reveal>
+            <Reveal delay={280}><div className="spec"><b><CountUp to={340} /></b><span>{t('sp_l3')}</span></div></Reveal>
+            <Reveal delay={360}><div className="spec"><b><CountUp to={1} /> / <CountUp to={1} /></b><span>{t('sp_l4')}</span></div></Reveal>
+          </div>
+          <Reveal delay={200}><p className="specs-note">{t('sp_note')}</p></Reveal>
+          </div>
+        </PinSection>
 
-      <MacroZoom />
 
-      <TextBlock
-        over
-        k="03 — Detail"
-        h={<>Small things that<br /><span>build the character.</span></>}
-        paras={[
-          'A headlight with three light lines, a carbon air duct, a hexagonal radiator mesh and a yellow blade in the bumper. In the macro view you can see how the matte paint kills reflections and highlights the relief.',
-          'Details, documents and photographs of the lot are below.',
-        ]}
-      />
+        <PinSection id="provenance" className="split rise" fit=".split-copy">
+          <div className="split-img">
+            <picture>
+              <source media="(max-width: 900px)" srcSet="/macro/macro-900.webp" />
+              <img src="/macro/macro-1600.webp" alt="" />
+            </picture>
+          </div>
+          <div className="split-copy">
+            <Reveal><small>{t('pv_k')}</small></Reveal>
+            <Reveal delay={80}><h2>{t('pv_h1')}<br /><span>{t('pv_h2')}</span></h2></Reveal>
+            <Reveal delay={160}><p>{t('pv_p1')}</p></Reveal>
+            <Reveal delay={240}><p>{t('pv_p2')}</p></Reveal>
+            <Reveal delay={320}>
+              <ul className="stats">
+                <li><b><CountUp to={4120} /></b><span>{t('pv_l1')}</span></li>
+                <li><b>#<CountUp to={157} /></b><span>{t('pv_l2')} <CountUp to={400} /></span></li>
+                <li><b><CountUp to={2024} /></b><span>{t('pv_l3')}</span></li>
+              </ul>
+            </Reveal>
+          </div>
+        </PinSection>
 
-      <section id="numbers" className="specs" aria-label="Specifications">
-        <Reveal><small>LOT 0001 — NUMBERS</small></Reveal>
-        <Reveal delay={80}><h2>Numbers that<br /><span>speak for themselves.</span></h2></Reveal>
-        <div className="specs-grid">
-          <Reveal delay={120}><div className="spec"><b><CountUp to={780} /></b><span>horsepower</span></div></Reveal>
-          <Reveal delay={200}><div className="spec"><b><CountUp to={2.5} decimals={1} /></b><span>0–100 km/h, s</span></div></Reveal>
-          <Reveal delay={280}><div className="spec"><b><CountUp to={340} /></b><span>top speed, km/h</span></div></Reveal>
-          <Reveal delay={360}><div className="spec"><b><CountUp to={1} /> / <CountUp to={1} /></b><span>one of a kind</span></div></Reveal>
-        </div>
-        <Reveal delay={200}><p className="specs-note">Demo values: replace them with the data of the car.</p></Reveal>
-      </section>
-
-      <section id="provenance" className="split">
-        <div className="split-img">
-          <picture>
-            <source media="(max-width: 900px)" srcSet="/macro/macro-900.webp" />
-            <img src="/macro/macro-1600.webp" alt="" />
-          </picture>
-        </div>
-        <div className="split-copy">
-          <Reveal><small>LOT 0001 — PROVENANCE</small></Reveal>
-          <Reveal delay={80}><h2>One of a kind.<br /><span>Handled with care.</span></h2></Reveal>
-          <Reveal delay={160}><p>The lot has been inspected and photographed by our team. We check the body, the cabin, the documents and the ownership history, and publish only what is confirmed.</p></Reveal>
-          <Reveal delay={240}><p>Demo text: replace it with the real data about the car, its ownership history and documents.</p></Reveal>
-          <Reveal delay={320}>
-            <ul className="stats">
-              <li><b><CountUp to={4120} /></b><span>km, odometer</span></li>
-              <li><b>#<CountUp to={157} /></b><span>of <CountUp to={400} /></span></li>
-              <li><b><CountUp to={2024} /></b><span>certified</span></li>
-            </ul>
-          </Reveal>
-        </div>
-      </section>
-
-      <Footer />
+        <Footer />
+      </div>
     </main>
   );
 }
