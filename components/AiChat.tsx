@@ -61,7 +61,7 @@ export default function AiChat() {
           </div>
           <div className="ai-list" ref={list} aria-live="polite">
             {entries.map((m) => <p key={m.id} className={`ai-msg ${m.from === 'ai' ? 'bot' : 'me'}`}>{m.raw ?? t(m.k!)}</p>)}
-            {typing && <p className="ai-msg bot ai-typing" aria-label={t('ai_typing')}><i /><i /><i /></p>}
+            {typing && <p className="ai-msg bot ai-typing" role="status" aria-label={t('ai_typing')}><i /><i /><i /></p>}
           </div>
           <div className="ai-quick">
             {QUICK.map((n) => <button key={n} onClick={() => ask(t(`ai_q${n}`), n)} disabled={typing}>{t(`ai_q${n}`)}</button>)}

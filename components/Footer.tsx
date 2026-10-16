@@ -11,17 +11,17 @@ export default function Footer() {
           <p className="muted">{t('f_about')}</p>
         </div>
         <div>
-          <h4>{t('f_lot')}</h4>
+          <h3>{t('f_lot')}</h3>
           <p>{t('f_paint')}</p>
           <p>{t('f_carbon')}</p>
           <a className="btn" href="mailto:hello@example.com">{t('contact_seller')} <span className="arr">→</span></a>
         </div>
         <div>
-          <h4>{t('f_garage')}</h4>
+          <h3>{t('f_garage')}</h3>
           <a href="#top">{t('f_collection')}</a><a href="#top">{t('f_sell')}</a><a href="#top">{t('f_concierge')}</a><a href="#top">{t('f_journal')}</a>
         </div>
         <div>
-          <h4>{t('f_contact')}</h4>
+          <h3>{t('f_contact')}</h3>
           <a href="mailto:hello@example.com" dir="ltr">hello@example.com</a>
           <p className="muted" dir="ltr">+00 000 000 00 00</p>
         </div>

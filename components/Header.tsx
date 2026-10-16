@@ -105,14 +105,14 @@ export default function Header() {
         {sent ? (
           <div className="form-done">
             <small>{t('c_thanks')}</small>
-            <h3>{t('c_done')}</h3>
+            <h2>{t('c_done')}</h2>
             <p>{t('c_done_p')}</p>
             <button className="btn" onClick={close}>{t('close')}</button>
           </div>
         ) : (
           <form className="form" onSubmit={submit}>
             <small>{t('c_lot')}</small>
-            <h3>{t('c_title')}</h3>
+            <h2>{t('c_title')}</h2>
             <label>{t('c_name')}<input required name="name" autoComplete="name" /></label>
             <label>{t('c_email')}<input required type="email" name="email" autoComplete="email" dir="ltr" /></label>
             <label>{t('c_msg')}<textarea name="msg" rows={4} defaultValue={t('c_msg_def')} /></label>

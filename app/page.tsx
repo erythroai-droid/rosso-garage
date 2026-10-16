@@ -16,7 +16,7 @@ import { SmoothScroll, gsap, initMagnet, registerZone, ScrollTrigger, useScrollR
 
 const Cap = ({ k, h, p, cta }: { k: string; h: string; p: string; cta?: string }) => (
   <div className="cap">
-    <b>{k}</b><h3>{h}</h3><p>{p}</p>
+    <b>{k}</b><h2>{h}</h2><p>{p}</p>
     {cta && <a className="more" href="#detail">{cta} <span className="arr">→</span></a>}
   </div>
 );
@@ -111,7 +111,7 @@ function Content({ onLoadProgress }: { onLoadProgress: (v: number) => void }) {
       <div className="grp over" style={{ zIndex: 3 }}>
         <TextBlock k={t('b3k')} h1={t('b3h1')} h2={t('b3h2')} paras={[t('b3p1'), t('b3p2')]} />
         <PinSection id="numbers" className="specs rise" fit=".specs-in">
-          <div className="specs-in" aria-label={t('sp_label')}>
+          <div className="specs-in" role="group" aria-label={t('sp_label')}>
           <Reveal><small>{t('sp_k')}</small></Reveal>
           <Reveal delay={80}><h2>{t('sp_h1')}<br /><span>{t('sp_h2')}</span></h2></Reveal>
           <div className="specs-grid">

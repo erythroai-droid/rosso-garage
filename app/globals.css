@@ -18,9 +18,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 html[lang=he] body{font-family:var(--font-he),"Segoe UI",Arial,sans-serif}                /* one consistent Hebrew face */
 html[lang=he] body *:not(.num){letter-spacing:0!important}                                 /* no tracking on Hebrew */
 html[lang=he] .seq-title h1,html[lang=he] .big,html[lang=he] .macro-title h2,html[lang=he] .tb h2,html[lang=he] .specs h2,html[lang=he] .split-copy h2{line-height:1.02;font-weight:800}
-html[lang=he] .cap h3,html[lang=he] .modal h3{line-height:1.25}
+html[lang=he] .cap h2,html[lang=he] .modal h2{line-height:1.25}
 html[lang=he] .cap p,html[lang=he] .tb p,html[lang=he] .split-copy p{line-height:1.75}
-html[lang=he] .cap b,html[lang=he] small,html[lang=he] h4{font-weight:600}
+html[lang=he] .cap b,html[lang=he] small,html[lang=he] h3{font-weight:600}
 
 /* ---------- header ---------- */
 .hdr{position:fixed;z-index:30;inset-block-start:0;inset-inline:0;display:flex;justify-content:space-between;align-items:center;padding:22px var(--gx)}
@@ -57,7 +57,7 @@ html[lang=he] .cap b,html[lang=he] small,html[lang=he] h4{font-weight:600}
 .scene.end{inset-inline-start:auto;inset-inline-end:var(--gx);text-align:end}
 .scene.on{opacity:1;transform:none;pointer-events:auto}
 .cap b{display:block;font-size:11px;letter-spacing:.3em;color:var(--red);text-transform:uppercase;margin-block-end:12px;font-weight:600}
-.cap h3{font-weight:400;font-size:clamp(20px,2vw,30px);line-height:1.2;letter-spacing:-.01em;margin-block-end:12px}
+.cap h2{font-weight:400;font-size:clamp(20px,2vw,30px);line-height:1.2;letter-spacing:-.01em;margin-block-end:12px}
 .cap p{color:var(--mute);font-size:14px;line-height:1.55}
 .more{display:inline-flex;gap:10px;margin-block-start:22px;font-size:13px;border-block-end:1px solid var(--line);padding-block-end:4px}
 
@@ -147,7 +147,7 @@ html[lang=he] .cap b,html[lang=he] small,html[lang=he] h4{font-weight:600}
 .ftr{position:relative;isolation:isolate;overflow:hidden;background:#07080b url('/frames/orbit/poster.jpg') center/cover no-repeat;padding:18vh var(--gx) 30px;min-height:var(--vh);display:flex;flex-direction:column;justify-content:flex-end}
 .ftr::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to bottom,#07080b 0%,rgba(7,8,11,.55) 35%,rgba(7,8,11,.82) 75%,#07080b 100%)}
 .ftr-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px}
-.ftr h4{font-size:11px;letter-spacing:.3em;color:var(--mute);margin-block-end:18px;font-weight:500;text-transform:uppercase}
+.ftr h3{font-size:11px;letter-spacing:.3em;color:var(--mute);margin-block-end:18px;font-weight:500;text-transform:uppercase}
 .ftr a:not(.btn),.ftr p{display:block;font-size:14px;line-height:1.5;margin-block-end:10px}
 .ftr .logo{margin-block-end:18px}
 .ftr .btn{margin-block-start:14px}
@@ -172,7 +172,7 @@ html[lang=he] .cap b,html[lang=he] small,html[lang=he] h4{font-weight:600}
 .modal-x{position:absolute;inset-block-start:16px;inset-inline-end:16px;width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%}
 .modal-x:hover{background:var(--fg);color:#000}
 .modal small{font-size:11px;letter-spacing:.3em;color:var(--red);text-transform:uppercase}
-.modal h3{font-weight:800;font-size:clamp(26px,3vw,38px);letter-spacing:-.03em;text-transform:uppercase;margin-block:14px 22px}
+.modal h2{font-weight:800;font-size:clamp(26px,3vw,38px);letter-spacing:-.03em;text-transform:uppercase;margin-block:14px 22px}
 .form label{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);margin-block-end:16px}
 .form input,.form textarea,.srch input{display:block;width:100%;margin-block-start:8px;background:transparent;border:0;border-block-end:1px solid var(--line);color:var(--fg);font:inherit;font-size:16px;letter-spacing:0;text-transform:none;padding-block:8px;outline:none}
 .form input:focus,.form textarea:focus,.srch input:focus{border-color:var(--red)}
@@ -251,20 +251,23 @@ html.static .specs-in,html.static .split-copy{zoom:1}
 html.static .ftr{min-height:0;padding-block-start:96px}
 html.static .cards,html.static .macro-static{background:var(--bg)}
 /* every card is a whole screen: the image fills the block, heading on top, caption at the bottom */
-html.static .card{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;overflow:hidden;background:#000}
+html.static .card{position:relative;min-height:clamp(360px,56svh,520px);display:flex;flex-direction:column;overflow:hidden;background:#000}
 html.static .card-img{position:absolute;inset:0;aspect-ratio:auto;overflow:hidden;background:#000}
 html.static .card-img img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
 html.static .card-img::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(7,8,11,.78),rgba(7,8,11,.05) 32%,rgba(7,8,11,.05) 52%,rgba(7,8,11,.92)),rgba(0,0,0,var(--dim))}
 html.static .card-head{position:relative;z-index:2;padding:96px var(--gx) 0}
-html.static .card-copy{position:relative;z-index:2;margin-block-start:auto;padding:0 var(--gx) 48px}
+html.static .card-copy{position:relative;z-index:2;margin-block-start:auto;padding:120px var(--gx) 36px}
+html.static .card:first-child,html.static .macro-static{min-height:min(100svh,760px)}
+html.static .card:not(:first-child) .cap b{margin-block-end:8px}
+html.static .card+.card{border-block-start:1px solid rgba(255,255,255,.08)}
 html.static .card-copy>p{color:rgba(242,239,233,.82);font-size:15px;line-height:1.6;max-width:30em}
 html.static .cap p{color:rgba(242,239,233,.78)}
 /* provenance: the photo is the background of the whole block */
-html.static .split{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+html.static .split{position:relative;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
 html.static .split-img{position:absolute;inset:0;height:auto;aspect-ratio:auto}
 html.static .split-img img{width:100%;height:100%;object-fit:cover}
 html.static .split-img::after{background:linear-gradient(to bottom,rgba(7,8,11,.55),rgba(7,8,11,.8) 45%,rgba(7,8,11,.94)),rgba(0,0,0,var(--dim))}
-html.static .split-copy{position:relative;z-index:2;padding:96px var(--gx) 56px}
+html.static .split-copy{position:relative;z-index:2;padding:72px var(--gx) 48px}
 html.static .seq-title,html.static .scene,html.static .hud{display:none}
 
 
