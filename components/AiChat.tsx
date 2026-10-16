@@ -1,7 +1,7 @@
 'use client';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
-import { gsap } from '@/lib/scroll';
+import { gsap, lockScroll } from '@/lib/scroll';
 
 type Entry = { id: number; from: 'ai' | 'me'; k?: string; raw?: string };
 const QUICK = [1, 2, 3, 4] as const;
@@ -26,8 +26,10 @@ export default function AiChat() {
     if (!open) return;
     const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
     document.addEventListener('keydown', esc);
+    const phone = matchMedia('(max-width: 900px)').matches;   // a full-width sheet: keep the page from scrolling underneath
+    if (phone) lockScroll(true);
     if (panel.current) gsap.fromTo(panel.current, { y: 24, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 0.45, ease: 'power3.out' });
-    return () => document.removeEventListener('keydown', esc);
+    return () => { document.removeEventListener('keydown', esc); if (phone) lockScroll(false); };
   }, [open]);
 
   const ask = (raw: string, q?: number) => {
