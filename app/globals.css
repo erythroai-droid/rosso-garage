@@ -209,6 +209,9 @@ html:is([lang=he],[lang=ar]) :is(.cap b,small,h3){font-weight:600}
   .tb h2,.specs h2,.split-copy h2{font-size:clamp(40px,15.5vw,96px);line-height:.9;overflow-wrap:break-word;hyphens:auto}
   .specs h2{font-size:clamp(34px,12vw,80px)}
   .cap h2{font-weight:800;text-transform:uppercase;letter-spacing:-.03em;line-height:.95;font-size:clamp(30px,10vw,56px)}
+  html[lang=ar] .cap h2{font-size:clamp(22px,6.4vw,36px);line-height:1.25;margin-block-end:8px}   /* Arabic strings are longer: keep the caption below the price block */
+  html[lang=ar] .cap p{font-size:13px;line-height:1.6}
+  html[lang=ar] .more{margin-block-start:14px}
   .tb-stats b{font-size:clamp(28px,34cqw,100px)}.spec b{font-size:clamp(34px,34cqw,120px)}
   .specs-grid{grid-template-columns:1fr 1fr;row-gap:44px}
   .split{grid-template-columns:1fr}.split-img{height:55vh}.split-copy{padding:48px var(--gx)}
