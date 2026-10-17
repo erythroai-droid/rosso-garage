@@ -148,6 +148,8 @@ html:is([lang=he],[lang=ar]) :is(.cap b,small,h3){font-weight:600}
 /* ---------- footer over poster ---------- */
 .ftr{position:relative;isolation:isolate;overflow:hidden;background:#07080b url('/frames/orbit/poster.jpg') center/cover no-repeat;padding:18vh var(--gx) 30px;min-height:var(--vh);display:flex;flex-direction:column;justify-content:flex-end}
 .ftr::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to bottom,#07080b 0%,rgba(7,8,11,.55) 35%,rgba(7,8,11,.82) 75%,#07080b 100%)}
+.ftr-title{flex:1;display:flex;align-items:center;justify-content:center;width:100%;font-size:calc((100vw - 2 * var(--gx)) / 8.1);font-weight:800;line-height:1;letter-spacing:-.02em;white-space:nowrap;text-transform:uppercase;color:#fff;margin-block-end:60px}
+.ftr-title span{color:var(--red)}
 .ftr-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px}
 .ftr h3{font-size:11px;letter-spacing:.3em;color:var(--mute);margin-block-end:18px;font-weight:500;text-transform:uppercase}
 .ftr a:not(.btn),.ftr p{display:block;font-size:14px;line-height:1.5;margin-block-end:10px}

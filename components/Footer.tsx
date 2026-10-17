@@ -5,6 +5,7 @@ export default function Footer() {
   const { t } = useI18n();
   return (
     <footer className="ftr rise" id="contact" data-slide="blk">
+      <div className="ftr-title" dir="ltr" aria-hidden="true">ROSSO&nbsp;<span>SPIDER</span></div>
       <div className="ftr-grid">
         <div>
           <div className="logo">rosso<br />garage</div>
