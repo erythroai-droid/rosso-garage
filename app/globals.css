@@ -18,7 +18,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 html[lang=he] body{font-family:var(--font-he),"Segoe UI",Arial,sans-serif}                /* one consistent Hebrew face */
 html[lang=ar] body{font-family:var(--font-ar),"Segoe UI",Arial,sans-serif}                /* one consistent Arabic face */
 html:is([lang=he],[lang=ar]) body *:not(.num){letter-spacing:0!important}                  /* no tracking on Hebrew/Arabic (it breaks Arabic joining) */
-html:is([lang=he],[lang=ar]) :is(.seq-title h1,.big,.macro-title h2,.tb h2,.specs h2,.split-copy h2){line-height:1.02;font-weight:800}
+html:is([lang=he],[lang=ar]) :is(.big,.macro-title h2,.tb h2,.specs h2,.split-copy h2){line-height:1.02;font-weight:800}
 html:is([lang=he],[lang=ar]) :is(.cap h2,.modal h2){line-height:1.25}
 html:is([lang=he],[lang=ar]) :is(.cap p,.tb p,.split-copy p){line-height:1.75}
 html:is([lang=he],[lang=ar]) :is(.cap b,small,h3){font-weight:600}
@@ -68,6 +68,7 @@ html:is([lang=he],[lang=ar]) :is(.cap b,small,h3){font-weight:600}
 
 /* big headlines: heavy uppercase, white + red */
 .seq-title h1,.card-head h1,.big,.macro-title h2{font-weight:800;font-size:clamp(46px,11.5vw,190px);line-height:.88;letter-spacing:-.045em;text-transform:uppercase}
+.seq-title h1{font-size:clamp(46px,min(11.5vw,calc(36vh - 190px)),190px)}   /* short windows: keep the title block clear of the bottom caption */
 .seq-title h1 span,.card-head h1 span,.big span,.macro-title h2 span,.tb h2 span,.specs h2 span,.split-copy h2 span{color:var(--red)}
 
 /* ---------- macro ---------- */
@@ -217,6 +218,15 @@ html:is([lang=he],[lang=ar]) :is(.cap b,small,h3){font-weight:600}
   .split{grid-template-columns:1fr}.split-img{height:55vh}.split-copy{padding:48px var(--gx)}
   .ftr-grid{grid-template-columns:1fr 1fr}.ftr-bot{flex-direction:column}
   .modal-box{padding:40px 22px 28px}
+}
+/* wide-and-short "mobile" screens (tablets, split windows): the title block and the bottom caption would meet, so size by height too */
+@media (max-width:900px) and (min-aspect-ratio:3/4){
+  .seq-title{inset-block-start:10vh}
+  .seq-title h1{font-size:clamp(48px,min(21.5vw,12vh),150px)}
+  .lot{margin-block-end:8px}.price{margin-block-start:12px}
+  .scene{max-width:min(560px,90vw);inset-block-end:9vh}
+  .cap h2{font-size:clamp(22px,4.2vw,34px);margin-block-end:8px}
+  .cap b{margin-block-end:8px}.more{margin-block-start:14px}
 }
 @media (prefers-reduced-motion:reduce){
   .scene{transition:none}
