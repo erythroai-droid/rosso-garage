@@ -81,12 +81,34 @@ export function goToSection(hash: string) {
     else document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' });
     return;
   }
-  if (hash === '#top') { sm.scrollTo(0, true); return; }
+  if (hash === '#top') { glideTo(0); return; }
   const el = document.querySelector<HTMLElement>(hash);
   const slide = el?.closest<HTMLElement>('[data-slide]') ?? el?.querySelector<HTMLElement>('[data-slide]') ?? el;
   if (!slide) return;
   const ref = slide.dataset.slide === 'tb' ? slide.closest<HTMLElement>('.grp') ?? slide : slide;   // a pinned block is measured through its group
-  sm.scrollTo(ref, true, 'top top');
+  glideTo(sm.offset(ref, 'top top'));
+}
+
+// sm.scrollTo(y, true) moves the native scroll at once and leaves the content to catch up within the smoothing time, so over many screens
+// (footer -> top) the page just jumps. Tween the native scroll instead; the smoother still softens it. Any user input hands control back.
+let glide: gsap.core.Tween | null = null;
+function glideTo(y: number) {
+  glide?.kill();
+  const from = window.scrollY, dist = Math.abs(y - from);
+  if (dist < 2) return;
+  const pos = { y: from };
+  const stop = () => glide?.kill();
+  const input = ['wheel', 'touchstart', 'keydown', 'mousedown'] as const;
+  const done = () => input.forEach((e) => window.removeEventListener(e, stop));
+  input.forEach((e) => window.addEventListener(e, stop, { passive: true }));
+  glide = gsap.to(pos, {
+    y,
+    duration: prefersReducedMotion() ? 0.01 : Math.min(2.6, 0.9 + (dist / window.innerHeight) * 0.08),   // longer for longer trips, capped
+    ease: 'power3.inOut',
+    onUpdate: () => window.scrollTo(0, pos.y),
+    onComplete: done,
+    onInterrupt: done,
+  });
 }
 
 export { gsap, ScrollTrigger, ScrollSmoother };
