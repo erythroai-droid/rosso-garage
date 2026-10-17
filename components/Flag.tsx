@@ -14,6 +14,12 @@ export default function Flag({ code, size = 22 }: { code: Lang; size?: number })
       <g fill="none" stroke="#0038b8" strokeWidth="1.1"><path d="M15 6.2l3.5 6.1h-7z" /><path d="M15 13.2l-3.5-6.1h7z" /></g>
     </svg>
   );
+  if (code === 'ar') return (  // Arabic: generic green pennant with a white crescent (no single country)
+    <svg {...common}>
+      <rect width="30" height="20" fill="#006c35" />
+      <path d="M17.5 5.2a5 5 0 1 0 0 9.6 4 4 0 1 1 0-9.6z" fill="#fff" />
+    </svg>
+  );
   return (  // en: United Kingdom
     <svg {...common}>
       <rect width="30" height="20" fill="#012169" />

@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { I18nProvider } from '@/lib/i18n';
-import { Heebo } from 'next/font/google';
+import { Heebo, Noto_Sans_Arabic } from 'next/font/google';
 
 // Hebrew-capable sans that matches the Helvetica look of the Latin text (system Helvetica has no Hebrew glyphs)
 const heebo = Heebo({ subsets: ['hebrew', 'latin'], weight: ['400', '500', '600', '800'], variable: '--font-he', display: 'swap' });
+
+// Arabic-capable sans for the same reason
+const notoAr = Noto_Sans_Arabic({ subsets: ['arabic', 'latin'], weight: ['400', '500', '600', '800'], variable: '--font-ar', display: 'swap' });
 
 export const metadata: Metadata = {
   title: 'rosso garage — Rosso Spider',
@@ -14,7 +17,7 @@ export const viewport: Viewport = { themeColor: '#07080b', width: 'device-width'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" dir="ltr" className={heebo.variable} suppressHydrationWarning>
+    <html lang="en" dir="ltr" className={`${heebo.variable} ${notoAr.variable}`} suppressHydrationWarning>
       <head>
         {/* decide the static (no-animation) layout before first paint, so phones never flash the animated one */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.toggle('static',matchMedia('(max-width: 900px), (prefers-reduced-motion: reduce)').matches)" }} />

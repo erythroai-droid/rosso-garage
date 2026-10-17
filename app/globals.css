@@ -16,11 +16,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .arr{display:inline-block}
 [dir=rtl] .arr{transform:scaleX(-1)}                         /* arrows point the reading direction */
 html[lang=he] body{font-family:var(--font-he),"Segoe UI",Arial,sans-serif}                /* one consistent Hebrew face */
-html[lang=he] body *:not(.num){letter-spacing:0!important}                                 /* no tracking on Hebrew */
-html[lang=he] .seq-title h1,html[lang=he] .big,html[lang=he] .macro-title h2,html[lang=he] .tb h2,html[lang=he] .specs h2,html[lang=he] .split-copy h2{line-height:1.02;font-weight:800}
-html[lang=he] .cap h2,html[lang=he] .modal h2{line-height:1.25}
-html[lang=he] .cap p,html[lang=he] .tb p,html[lang=he] .split-copy p{line-height:1.75}
-html[lang=he] .cap b,html[lang=he] small,html[lang=he] h3{font-weight:600}
+html[lang=ar] body{font-family:var(--font-ar),"Segoe UI",Arial,sans-serif}                /* one consistent Arabic face */
+html:is([lang=he],[lang=ar]) body *:not(.num){letter-spacing:0!important}                  /* no tracking on Hebrew/Arabic (it breaks Arabic joining) */
+html:is([lang=he],[lang=ar]) :is(.seq-title h1,.big,.macro-title h2,.tb h2,.specs h2,.split-copy h2){line-height:1.02;font-weight:800}
+html:is([lang=he],[lang=ar]) :is(.cap h2,.modal h2){line-height:1.25}
+html:is([lang=he],[lang=ar]) :is(.cap p,.tb p,.split-copy p){line-height:1.75}
+html:is([lang=he],[lang=ar]) :is(.cap b,small,h3){font-weight:600}
 
 /* ---------- header ---------- */
 .hdr{position:fixed;z-index:30;inset-block-start:0;inset-inline:0;display:flex;justify-content:space-between;align-items:center;padding:22px var(--gx)}
